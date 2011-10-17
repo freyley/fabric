@@ -13,6 +13,15 @@ from StringIO import StringIO
 from fabric.api import *
 
 
+def _quiet_or_verbose_run(func, cmd, verbose=False):
+    # If verbose, run normally
+    if verbose:
+        with settings(warn_only=True):
+            return not func(cmd).failed
+    # Otherwise, be quiet
+    with settings(hide('everything'), warn_only=True):
+        return not func(cmd).failed
+
 def exists(path, use_sudo=False, verbose=False):
     """
     Return True if given path exists on the current remote host.
@@ -26,14 +35,36 @@ def exists(path, use_sudo=False, verbose=False):
     """
     func = use_sudo and sudo or run
     cmd = 'test -e "%s"' % path
-    # If verbose, run normally
-    if verbose:
-        with settings(warn_only=True):
-            return not func(cmd).failed
-    # Otherwise, be quiet
-    with settings(hide('everything'), warn_only=True):
-        return not func(cmd).failed
+    return _quiet_or_verbose_run(func, cmd, verbose)
 
+def is_dir(path, use_sudo=False, verbose=False):
+    """ 
+    Return True if given path is a directory on the current remote host.
+   
+    if ``use_sudo`` is True, will use `sudo` instead of `run`.
+
+    `is_dir` will, by default, hide all output in order to avoid clutter. 
+    You may specify ``verbose=True`` to change this behavior.
+    """
+    func = use_sudo and sudo or run
+    cmd = 'test -d "%s"' % path
+    return _quiet_or_verbose_run(func, cmd, verbose)
+
+def is_symlink(path, use_sudo=False, verbose=False):
+    """ 
+    Return True if given path is a symlink on the current remote host.
+   
+    if ``use_sudo`` is True, will use `sudo` instead of `run`.
+
+    `is_symlink` will, by default, hide all output in order to avoid clutter. 
+    You may specify ``verbose=True`` to change this behavior.
+    """
+    func = use_sudo and sudo or run
+    cmd = 'test -L "%s"' % paths
+    return _quiet_or_verbose_run(func, cmd, verbose)
+
+
+    
 
 def first(*args, **kwargs):
     """
