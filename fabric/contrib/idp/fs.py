@@ -32,8 +32,8 @@ class Directory(BaseIDP):
         if 'user' in kwargs:
             self.user = kwargs.get('user')
         super(Directory, self).__init__(**kwargs)
-        self.exists = exists
-        self.is_dir = is_dir
+        self._exists = exists
+        self._is_dir = is_dir
 
     @property
     def commands(self):
@@ -45,8 +45,8 @@ class Directory(BaseIDP):
         if self.group:
             cmds.append(Command("chgrp %s %s" % (self.group, self.name), True))
             
-        if self.exists(self.name):
-            if self.is_dir(self.name):
+        if self._exists(self.name):
+            if self._is_dir(self.name):
                 return cmds
             else:
                 cmds = [Command('rm %s' % self.name), Command('mkdir %s' % self.name)] + cmds

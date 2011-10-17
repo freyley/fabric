@@ -19,10 +19,10 @@ class IDPDirectoryTests(unittest.TestCase):
         d = Directory('/foo', commit=False, chmod='0777')
         self.assertEqual(['mkdir -p /foo', 'chmod 0777 /foo'], 
                          [unicode(c) for c in d.commands])
-        d.exists = lambda x: True
+        d._exists = lambda x: True
         self.assertEqual(['rm /foo', 'mkdir /foo', 'chmod 0777 /foo'], 
                          [unicode(c) for c in d.commands])
-        d.is_dir = lambda x: True
+        d._is_dir = lambda x: True
         self.assertEqual(['chmod 0777 /foo'], 
                          [unicode(c) for c in d.commands])
 
