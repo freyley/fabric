@@ -8,11 +8,10 @@ class IDPDirectoryTests(unittest.TestCase):
 
     def setUp(self):
        # Set up default networking for test server
+        # we don't actually use this, but if we don't do it, tests ask questions on the command line
         env.disable_known_hosts = True
         env.update(to_dict('%s@%s:%s' % (USER, HOST, PORT)))
         env.password = PASSWORDS[USER]
-        # Command response mocking is easier without having to account for
-        # shell wrapping everywhere.
         env.use_shell = False
 
     @server()
