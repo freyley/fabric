@@ -60,7 +60,7 @@ def is_symlink(path, use_sudo=False, verbose=False):
     You may specify ``verbose=True`` to change this behavior.
     """
     func = use_sudo and sudo or run
-    cmd = 'test -L "%s"' % paths
+    cmd = 'test -L "%s"' % path
     return _quiet_or_verbose_run(func, cmd, verbose)
 
 
