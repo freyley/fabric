@@ -25,6 +25,21 @@ class IDPDirectoryTests(unittest.TestCase):
         d._is_dir = lambda x: True
         self.assertEqual(['chmod 0777 /foo'], 
                          [unicode(c) for c in d.commands])
+        cmdsrun = []
+        def fake_run(cmd):
+            cmdsrun.append(cmd)
+        d = Directory('/foo', commit=False, owner="foo", chmod="0343", 
+                      runcmd=fake_run, sudocmd=fake_run)
+        d._exists = lambda x: True
+        d.run()
+        self.assertEqual(['rm /foo', 'mkdir /foo', 'chmod 0343 /foo', 'chown foo /foo'],
+                         cmdsrun)
+class IDPSymlinkTests(unittest.TestCase):
+    pass
+
+class IDPGitRepositoryTests(unittest.TestCase):
+    pass
+
 
 if __name__=='__main__':
     unittest.main()

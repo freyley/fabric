@@ -13,7 +13,7 @@ class Directory(BaseIDP):
            ``name`` the directory path 
         Optional Arguments:
              chmod='0777' to set the permissions. No default.
-             user='someuser' to set the user. No default.
+             owner='someuser' to set the owner. No default.
              group='somegroup' to set the group. No default.
            `` runcmd``, ``sudocmd``, and ``commit`` from BaseIDP -- see BaseIDP for 
            documentation.
@@ -21,7 +21,7 @@ class Directory(BaseIDP):
         """
         self.name = name
 
-        self.chmod = self.group = self.user = None
+        self.chmod = self.group = self.owner = None
         if 'chmod' in kwargs:
             self.chmod = kwargs.get('chmod')
             if not re.match('^[01234567]{4}$', self.chmod):
@@ -29,8 +29,8 @@ class Directory(BaseIDP):
 
         if 'group' in kwargs:
             self.group = kwargs.get('group')
-        if 'user' in kwargs:
-            self.user = kwargs.get('user')
+        if 'owner' in kwargs:
+            self.owner = kwargs.get('owner')
         super(Directory, self).__init__(**kwargs)
         self._exists = exists
         self._is_dir = is_dir
@@ -40,8 +40,8 @@ class Directory(BaseIDP):
         cmds = []
         if self.chmod:
             cmds.append(Command('chmod %s %s' % (self.chmod, self.name)))
-        if self.user:
-            cmds.append(Command("chown %s %s" % (self.user, self.name), True))
+        if self.owner:
+            cmds.append(Command("chown %s %s" % (self.owner, self.name), True))
         if self.group:
             cmds.append(Command("chgrp %s %s" % (self.group, self.name), True))
             
