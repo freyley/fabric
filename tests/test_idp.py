@@ -18,6 +18,12 @@ class FabricTestCase(unittest.TestCase):
 
 
 class IDPDirectoryTests(FabricTestCase):
+    @server()
+    def test_permissions_recurse(self):
+        p = Directory('/foo', recurse_perms=True, chmod='2743', 
+                            owner='nobody', group='none', commit=False)
+        self.assertEqual([u'mkdir -p /foo', 'chmod -R 2743 /foo', 'chown -R nobody /foo', 
+                          'chgrp -R none /foo',], self.cmdstostr(p.commands))
 
     @server()
     def test_directory(self):
@@ -54,7 +60,10 @@ class IDPSymlinkTests(FabricTestCase):
         
         
 class IDPGitRepositoryTests(FabricTestCase):
-    pass
+    @server()
+    def test_gitrepo(self):
+        g = GitRepository('/foo', 'git@github.com/example/example.git', commit=False)
+        self.assertEqual(["ssh -A username@127.0.0.1:2200 'cd /; git clone git@github.com/example/example.git foo'"], self.cmdstostr(g.commands))
 
 
 if __name__=='__main__':

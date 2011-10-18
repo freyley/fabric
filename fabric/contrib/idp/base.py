@@ -1,9 +1,11 @@
 from fabric.api import sudo, run
+from fabric.api import local as run_local
 
 class Command(object):
-    def __init__(self, cmd, use_sudo=False):
+    def __init__(self, cmd, use_sudo=False, run_local=False):
         self.cmd = cmd
         self.use_sudo = use_sudo
+        self.run_local=run_local
 
     def __unicode__(self):
         return self.cmd
@@ -11,8 +13,13 @@ class Command(object):
 class BaseIDP(object):
     def __init__(self, **kwargs):
         """   
-          ``runcmd`` sets the command to use when running actions. default: run
-          ``sudocmd`` sets the command to use when running chgrp and chown. default: sudo
+          ``runcmd`` sets the command to use when running actions. 
+                             default: fabric.api.run
+          ``sudocmd`` sets the command to use when running chgrp and chown. 
+                               default: fabric.api.sudo
+          ``localcmd`` sets the command to use when running local commands.
+                               local commands are used primarily when something needs ssh key forwarding
+                               default: fabric.api.local
           ``commit`` False prevents immediate action, can call run() after. default: True
         """
 
@@ -24,6 +31,10 @@ class BaseIDP(object):
             self.sudocmd = kwargs.get('sudocmd')
         else:
             self.sudocmd = sudo
+        if 'localcmd' in kwargs and callable(kwargs.get('localcmd')):
+            self.localcmd = kwargs.get('localcmd')
+        else:
+            self.localcmd = run_local
 
         if 'commit' in kwargs and kwargs.get('commit'):
             self.run(self.commands)
@@ -35,6 +46,8 @@ class BaseIDP(object):
         for c in commands:
             if c.use_sudo:
                 self.sudocmd(unicode(c))
+            elif c.run_local:
+                self.localcmd(unicode(c))
             else:
                 self.runcmd(unicode(c))
                 
